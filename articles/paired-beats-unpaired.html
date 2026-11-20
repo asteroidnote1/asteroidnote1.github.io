@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paired beats unpaired: the same 4-point difference needs about 500 cases, not 1,447 per group</title>
+<meta name="description" content="Every number in this article comes from synthetic planning scenarios. None comes from a real model, product or benchmark. In this article, one point means 0.01, so a 4-point difference is 0.04.">
+<style>
+:root{--bg:#fff;--fg:#1c2128;--muted:#5a6572;--accent:#0b5cad;--line:#d8dee4;--soft:#f4f6f8;--code:#f4f6f8;--warn:#fff7e0;--warnline:#e3c36a}
+@media (prefers-color-scheme:dark){:root{--bg:#14181d;--fg:#e4e8ec;--muted:#9aa5b1;--accent:#6cb0ff;--line:#2f3741;--soft:#1c222a;--code:#1c222a;--warn:#2b2615;--warnline:#7a6420}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header.site,footer.site{max-width:44rem;margin:0 auto;padding:1rem 16px;font-size:.9rem;color:var(--muted)}
+header.site{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;border-bottom:1px solid var(--line)}
+header.site a.brand{font-weight:700;color:var(--fg);text-decoration:none}
+footer.site{border-top:1px solid var(--line);margin-top:3rem}
+main{max-width:44rem;margin:0 auto;padding:1rem 16px}
+a{color:var(--accent)}
+h1{font-size:2rem;line-height:1.2;margin:1.2rem 0 .8rem}
+h2{font-size:1.45rem;line-height:1.25;margin:2.2rem 0 .6rem}
+h3{font-size:1.15rem;margin:1.6rem 0 .4rem;color:var(--muted)}
+h1,h2,h3,p,li{overflow-wrap:break-word}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+blockquote{margin:1rem 0;padding:.2rem 1rem;border-left:4px solid var(--line);background:var(--soft);color:var(--muted)}
+code{font:.88em ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;background:var(--code);padding:.1em .3em;border-radius:3px}
+pre,.codehilite{background:var(--code);border:1px solid var(--line);border-radius:6px;overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+pre{padding:.8rem 1rem;font-size:.85rem;line-height:1.5}
+.codehilite pre{border:0;margin:0;background:transparent}
+pre code{background:none;padding:0;font-size:inherit}
+.tablewrap{overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:.92rem;min-width:100%}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.notice{background:var(--warn);border:1px solid var(--warnline);border-radius:6px;padding:.1rem 1rem;margin:1rem 0}
+#notify{scroll-margin-top:1rem}
+@media (max-width:600px){body{font-size:17px}h1{font-size:1.65rem}pre{font-size:.8rem}th,td{padding:.3rem .45rem}}
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #ffffcc }
+.codehilite { background: #f0f0f0; }
+.codehilite .c { color: #60A0B0; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #F00 } /* Error */
+.codehilite .k { color: #007020; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666 } /* Operator */
+.codehilite .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #007020 } /* Comment.Preproc */
+.codehilite .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F00 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888 } /* Generic.Output */
+.codehilite .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #04D } /* Generic.Traceback */
+.codehilite .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #007020 } /* Keyword.Pseudo */
+.codehilite .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #902000 } /* Keyword.Type */
+.codehilite .m { color: #40A070 } /* Literal.Number */
+.codehilite .s { color: #4070A0 } /* Literal.String */
+.codehilite .na { color: #4070A0 } /* Name.Attribute */
+.codehilite .nb { color: #007020 } /* Name.Builtin */
+.codehilite .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #60ADD5 } /* Name.Constant */
+.codehilite .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.codehilite .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #007020 } /* Name.Exception */
+.codehilite .nf { color: #06287E } /* Name.Function */
+.codehilite .nl { color: #002070; font-weight: bold } /* Name.Label */
+.codehilite .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #BB60D5 } /* Name.Variable */
+.codehilite .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #BBB } /* Text.Whitespace */
+.codehilite .mb { color: #40A070 } /* Literal.Number.Bin */
+.codehilite .mf { color: #40A070 } /* Literal.Number.Float */
+.codehilite .mh { color: #40A070 } /* Literal.Number.Hex */
+.codehilite .mi { color: #40A070 } /* Literal.Number.Integer */
+.codehilite .mo { color: #40A070 } /* Literal.Number.Oct */
+.codehilite .sa { color: #4070A0 } /* Literal.String.Affix */
+.codehilite .sb { color: #4070A0 } /* Literal.String.Backtick */
+.codehilite .sc { color: #4070A0 } /* Literal.String.Char */
+.codehilite .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #4070A0 } /* Literal.String.Double */
+.codehilite .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.codehilite .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.codehilite .sx { color: #C65D09 } /* Literal.String.Other */
+.codehilite .sr { color: #235388 } /* Literal.String.Regex */
+.codehilite .s1 { color: #4070A0 } /* Literal.String.Single */
+.codehilite .ss { color: #517918 } /* Literal.String.Symbol */
+.codehilite .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #06287E } /* Name.Function.Magic */
+.codehilite .vc { color: #BB60D5 } /* Name.Variable.Class */
+.codehilite .vg { color: #BB60D5 } /* Name.Variable.Global */
+.codehilite .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.codehilite .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.codehilite .il { color: #40A070 } /* Literal.Number.Integer.Long */</style>
+</head>
+<body>
+<header class="site"><a class="brand" href="../index.html">Is B Really Better?</a><a href="../quick-card.pdf">Quick Card (free PDF)</a><a href="../articles/paired-beats-unpaired.html">Paired vs unpaired</a><a href="../articles/how-many-judge-labels.html">Judge labels</a><a href="../privacy.html">Privacy</a></header>
+<main>
+<h1>Paired beats unpaired: the same 4-point difference needs about 500 cases, not 1,447 per group</h1>
+<p><em>Every number in this article comes from synthetic planning scenarios. None comes from a real model, product or benchmark. In this article, one point means 0.01, so a 4-point difference is 0.04.</em></p>
+<p>Your baseline A passes about 0.80 of your eval. You have a candidate B. The smallest difference that matters to you is 4 points, from 0.80 to 0.84.</p>
+<p>Before you write or label a single new case, you need to know how many cases it takes to see that difference reliably.</p>
+<p>There are two honest answers:</p>
+<ul>
+<li><strong>1,447 cases per group</strong> if A's and B's scores are compared as independent groups.</li>
+<li><strong>489 cases</strong> by the planning formula if you run A and B on the same cases and analyze the pairs. You need <strong>517</strong> if you decide with the exact test (see Catch 2).</li>
+</ul>
+<p>Few teams build two separate test sets. The common version of this mistake is running A and B on the same cases and then comparing the two scores as if they were independent. That throws away the same information.</p>
+<p>On the same cases, the paired analysis needs about a third as many: 1,447 / 489 ≈ 2.96. If you really did build two separate test sets, that would be 2,894 cases to write, about 5.9 times as many (2,894 / 489).</p>
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+<p>The difference and the error rates are the same in both designs. The rest of this article explains where the gap in sample size comes from and when it shrinks. It also shows how to reproduce the planning numbers yourself.</p>
+<h2>The settings</h2>
+<p>Both answers use the same settings:</p>
+<ul>
+<li><strong>Two-sided α = 0.05.</strong> If A and B are truly the same, you raise a false alarm (declare a difference, better or worse) at most 0.05 of the time.</li>
+<li><strong>Power = 0.80.</strong> If B is truly 4 points better, you detect it 4 times out of 5.</li>
+<li><strong>The difference:</strong> baseline 0.80, target 0.84, a difference of 0.04 (0.84 − 0.80).</li>
+</ul>
+<h2>The unpaired answer: 1,447 per group</h2>
+<p>The standard formula for comparing two proportions answers "how many cases per group?" This article uses the pooled-variance version (Fleiss, no continuity correction). For 0.80 versus 0.84, it gives <strong>1,447</strong> cases per group.</p>
+<p>There are two ways to end up here:</p>
+<ul>
+<li>You compare the two scores as independent on 1,447 shared cases.</li>
+<li>You build two separate test sets, one for A and one for B. That is 2 × 1,447 = 2,894 cases.</li>
+</ul>
+<p>Other sources may give slightly different numbers, depending on the formula:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Formula</th>
+<th>Cases per group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pooled (used here)</td>
+<td>1,447</td>
+</tr>
+<tr>
+<td>Unpooled variance</td>
+<td>1,445</td>
+</tr>
+<tr>
+<td>Baseline-variance shortcut</td>
+<td>1,570</td>
+</tr>
+</tbody>
+</table></div>
+<p>The shortcut plugs in the baseline variance twice, which makes it easy to compute by hand. In simulation, it delivered power of about 0.830 instead of the target 0.80. The pooled n delivered 0.798.</p>
+<p>So here the shortcut errs on the safe side. It asks for 123 more cases per group than needed (1,570 − 1,447).</p>
+<h2>The paired answer: 489</h2>
+<p>Now run A and B on the <strong>same</strong> cases and keep the per-case results. Each case lands in one of four cells:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>B passes</th>
+<th>B fails</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A passes</strong></td>
+<td>n11 (both pass)</td>
+<td>n10 (regression)</td>
+</tr>
+<tr>
+<td><strong>A fails</strong></td>
+<td>n01 (improvement)</td>
+<td>n00 (both fail)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Only the two off-diagonal cells say anything about whether B beats A:</p>
+<ul>
+<li><strong>n10:</strong> A passed and B failed (a regression).</li>
+<li><strong>n01:</strong> A failed and B passed (an improvement).</li>
+</ul>
+<p>A case that both systems pass tells you the case is easy. A case that both fail tells you it is hard. Neither tells you which system is better.</p>
+<p><strong>Discordance</strong> is the share of cases in those two cells. To compute it, count the cases where exactly one of A and B passes, and divide by n.</p>
+<p>Suppose discordance is 0.10:</p>
+<ul>
+<li>0.03 of cases regress, so p10 = 0.03.</li>
+<li>0.07 of cases improve, so p01 = 0.07.</li>
+<li>The net difference is 0.07 − 0.03 = 0.04.</li>
+</ul>
+<p>The paired sample-size formula (Connor 1987, <em>Sample size for testing differences in proportions for the paired-sample design</em>) then gives <strong>489</strong> cases.</p>
+<p>You build those 489 cases once and run them through both A and B.</p>
+<h2>Why pairing wins: the arithmetic</h2>
+<p>Sample size is driven by the per-case variance of the difference you are estimating.</p>
+<p><strong>Unpaired.</strong> Each group contributes its own binomial variance:</p>
+<p>0.80 × 0.20 + 0.84 × 0.16 = 0.16 + 0.1344 = <strong>0.2944</strong></p>
+<p><strong>Paired.</strong> Only discordant cases vary in the difference:</p>
+<p>discordance − difference² = 0.10 − 0.04² = 0.10 − 0.0016 = <strong>0.0984</strong></p>
+<p>The variance ratio is 0.2944 / 0.0984 ≈ 2.99. The ratio of the planned sizes per group is 1,447 / 489 ≈ 2.96.</p>
+<p>The two ratios are close but not identical. The reason is that the planning formulas also use the variance expected under "no difference," and that variance differs slightly between the two designs.</p>
+<p><strong>The intuition.</strong> Your cases differ in difficulty. An unpaired analysis has to treat that case-to-case variation as noise. A paired analysis cancels it, because each case serves as its own control. When A and B agree on most cases, as prompt and model variants usually do, you know the difference more precisely than either score.</p>
+<h2>Catch 1: discordance does all the work</h2>
+<p>The paired advantage depends entirely on discordance, and discordance depends on your change.</p>
+<p>Imagine that A's and B's outcomes were <strong>unrelated</strong> on every case. Discordance would then be:</p>
+<p>0.80 × (1 − 0.84) + (1 − 0.80) × 0.84 = 0.128 + 0.168 = <strong>0.296</strong></p>
+<p>Plug that into the paired variance: 0.296 − 0.0016 = 0.2944. That is exactly the unpaired value. <strong>At that discordance, pairing gains nothing.</strong> Pairing helps only because, in practice, A and B tend to pass and fail the same cases.</p>
+<p>A second scenario shows the advantage shrinking. Take 0.80 → 0.85 with discordance 0.20 (p10 = 0.075, p01 = 0.125):</p>
+<ul>
+<li>paired: 626 cases</li>
+<li>unpaired: 906 per group, or 1,812 in total on two separate sets</li>
+</ul>
+<p>The ratio per group is about 1.45 (906 / 626). Pairing is still worth it, but the advantage is nowhere near three.</p>
+<p><strong>Where to get a discordance estimate.</strong> Look at your own earlier comparisons on the same eval set. In a synthetic prompt-tweak example, discordance was 0.080.</p>
+<p>Some reasoning about what to expect (inference, not measured):</p>
+<ul>
+<li>A model swap can flip many cases in both directions, which raises discordance.</li>
+<li>A narrow prompt fix tends to flip fewer cases.</li>
+</ul>
+<p>If you are unsure, plan with the highest discordance you consider plausible. Higher discordance gives a larger n, which is the safe side.</p>
+<h2>Catch 2: the exact test is conservative</h2>
+<p>The usual test for paired pass/fail data is McNemar's (McNemar 1947, <em>Note on the sampling error of the difference between correlated proportions or percentages</em>). Its exact version conditions on the discordant pairs and uses the binomial distribution.</p>
+<p>The exact test is discrete, so in practice it rejects less often than its nominal α. At n = 200 with discordance 0.10, its actual false alarm rate is 0.029, not 0.05.</p>
+<p>The cost is power. At the Connor n of 489, the exact McNemar test has:</p>
+<ul>
+<li>power <strong>0.775</strong> by exact enumeration;</li>
+<li>power 0.775 by simulation (1,000,000 replicates), with a Monte Carlo standard error of 0.0004.</li>
+</ul>
+<p>The two agree to within the simulation's standard error. Enumeration has no simulation error, so treat it as the reference.</p>
+<p>The asymptotic (large-sample) McNemar test reaches about 0.81 at the same n.</p>
+<p><strong>What to do.</strong> If you will decide with the exact test, add a cushion. Search upward from n = 489 with <code>shipornot power-mcnemar --method enum</code> until power reaches 0.80. For this scenario, the smallest such n is <strong>517</strong>, with exact power 0.800. That is 28 more cases (517 − 489).</p>
+<h2>Reproduce it yourself</h2>
+<p><strong>1. The planning formulas in plain Python.</strong> This needs no dependencies.</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalDist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">ceil</span>
+
+<span class="n">z_a</span> <span class="o">=</span> <span class="n">NormalDist</span><span class="p">()</span><span class="o">.</span><span class="n">inv_cdf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># two-sided alpha 0.05</span>
+<span class="n">z_b</span> <span class="o">=</span> <span class="n">NormalDist</span><span class="p">()</span><span class="o">.</span><span class="n">inv_cdf</span><span class="p">(</span><span class="mf">0.80</span><span class="p">)</span>           <span class="c1"># power 0.80</span>
+
+<span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="mf">0.80</span><span class="p">,</span> <span class="mf">0.84</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span>                            <span class="c1"># difference</span>
+<span class="n">pbar</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">+</span> <span class="n">p2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">var_alt</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span>
+
+<span class="n">n_pooled</span>   <span class="o">=</span> <span class="n">ceil</span><span class="p">((</span><span class="n">z_a</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pbar</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pbar</span><span class="p">))</span> <span class="o">+</span> <span class="n">z_b</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">var_alt</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">n_simple</span>   <span class="o">=</span> <span class="n">ceil</span><span class="p">((</span><span class="n">z_a</span> <span class="o">+</span> <span class="n">z_b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">var_alt</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">n_baseline</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">((</span><span class="n">z_a</span> <span class="o">+</span> <span class="n">z_b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">p_disc</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.04</span>                 <span class="c1"># discordance, smallest difference that matters</span>
+<span class="n">n_paired</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">((</span><span class="n">z_a</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_disc</span><span class="p">)</span> <span class="o">+</span> <span class="n">z_b</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_disc</span> <span class="o">-</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">n_pooled</span><span class="p">,</span> <span class="n">n_simple</span><span class="p">,</span> <span class="n">n_baseline</span><span class="p">,</span> <span class="n">n_paired</span><span class="p">)</span>   <span class="c1"># expected: 1447 1445 1570 489</span>
+</code></pre></div>
+
+<p>The first three numbers are cases <strong>per group</strong>. The last is the total number of paired cases.</p>
+<p><strong>2. The same numbers with shipornot 0.1.0</strong> (free, MIT: <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>):</p>
+<div class="codehilite"><pre><span></span><code>shipornot<span class="w"> </span>n-unpaired<span class="w"> </span><span class="m">0</span>.80<span class="w"> </span><span class="m">0</span>.84<span class="w">                          </span><span class="c1"># per-group n: 1447</span>
+shipornot<span class="w"> </span>n-paired<span class="w"> </span><span class="m">0</span>.10<span class="w"> </span><span class="m">0</span>.04<span class="w"> </span>--check-exact<span class="w">              </span><span class="c1"># 489</span>
+shipornot<span class="w"> </span>power-mcnemar<span class="w"> </span>--method<span class="w"> </span>enum<span class="w"> </span><span class="m">489</span><span class="w"> </span><span class="m">0</span>.03<span class="w"> </span><span class="m">0</span>.07<span class="w">     </span><span class="c1"># about 0.775</span>
+shipornot<span class="w"> </span>power-mcnemar<span class="w"> </span>--method<span class="w"> </span>enum<span class="w"> </span><span class="m">517</span><span class="w"> </span><span class="m">0</span>.03<span class="w"> </span><span class="m">0</span>.07<span class="w">     </span><span class="c1"># about 0.800</span>
+shipornot<span class="w"> </span>power-mcnemar<span class="w"> </span>--method<span class="w"> </span>sim<span class="w"> </span>--sims<span class="w"> </span><span class="m">1000000</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">20261118</span><span class="w"> </span><span class="m">489</span><span class="w"> </span><span class="m">0</span>.03<span class="w"> </span><span class="m">0</span>.07<span class="w">   </span><span class="c1"># about 0.775</span>
+</code></pre></div>
+
+<p>Add <code>--json</code> to any of these for machine-readable output. Run any command with <code>--help</code> to see its options.</p>
+<p><strong>3. Exact power of the exact McNemar test, by enumeration.</strong> This needs numpy and scipy.</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">binom</span>
+
+<span class="n">n</span><span class="p">,</span> <span class="n">p10</span><span class="p">,</span> <span class="n">p01</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">489</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.05</span>
+<span class="n">p_disc</span> <span class="o">=</span> <span class="n">p10</span> <span class="o">+</span> <span class="n">p01</span>
+<span class="n">share_regress</span> <span class="o">=</span> <span class="n">p10</span> <span class="o">/</span> <span class="n">p_disc</span>
+
+<span class="n">power</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>                      <span class="c1"># m = number of discordant cases</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>                    <span class="c1"># b = regressions among them</span>
+    <span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">binom</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">m</span> <span class="o">-</span> <span class="n">b</span><span class="p">),</span> <span class="n">m</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">power</span> <span class="o">+=</span> <span class="n">binom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p_disc</span><span class="p">)</span> <span class="o">*</span> <span class="n">binom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">share_regress</span><span class="p">)[</span><span class="n">p_val</span> <span class="o">&lt;=</span> <span class="n">alpha</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>                      <span class="c1"># expected: 0.7754</span>
+</code></pre></div>
+
+<p>The result should match 0.7754. If it does not, your two-sided p-value is defined differently from the doubled-tail version used here.</p>
+<h2>What this changes in practice</h2>
+<ol>
+<li><strong>Plan with the MDE before you build cases.</strong> The MDE is the smallest difference your eval can reliably detect. A quick paired approximation at two-sided α = 0.05 and power 0.80 is MDE ≈ 2.8 × √(discordance / n), where 2.8 ≈ 1.96 + 0.84. Two checks:
+   - n = 200 and discordance 0.10: 2.8 × √(0.10 / 200) ≈ 0.063. Connor's formula gives 0.062.
+   - n = 200 and discordance 0.080: 2.8 × √(0.080 / 200) = 0.056. The walkthrough gives 0.056.</li>
+</ol>
+<p>For comparison, two independent groups of 200 cases each can only detect a gain of about 0.100 over 0.80.
+2. <strong>Freeze one case list.</strong> Run A and B on all of it, and keep per-case results keyed by a stable case ID.
+3. <strong>Analyze the pairs.</strong> Report two things:
+   - the 95% interval for pB − pA (Newcombe 1998, <em>Improved confidence intervals for the difference between binomial proportions based on paired data</em>; the default is Newcombe's method 8);
+   - the exact McNemar p-value.</p>
+<p><code>bash
+   shipornot paired-diff --csv results.csv --a-col a --b-col b
+   shipornot mcnemar --csv results.csv --a-col a --b-col b</code></p>
+<p>For a synthetic prompt-tweak example on 200 cases, the results are:</p>
+<ul>
+<li>B − A = +0.010</li>
+<li>95% interval: [−0.030, +0.050]  </li>
+<li>exact McNemar p = 0.8036
+4. <strong>Read the result against five outcomes:</strong> <strong>better</strong>, <strong>worse</strong>, <strong>not worse by the margin</strong>, <strong>no difference worth acting on</strong>, and <strong>not enough evidence</strong>. The "not worse" outcome counts only if you declared that question and its margin before the run.</li>
+</ul>
+<p>In the example, p is well above 0.05. Its interval runs from −0.030 to +0.050, so it rules out neither "no gain" nor a gain of 0.04 or more. No "not worse" question was declared, so the result is <strong>not enough evidence</strong>.
+5. <strong>Do not "add cases and re-test."</strong> The first test already spent the full 0.05. Instead:
+   - Treat the 200-case run as a pilot. It gave you a discordance estimate of 0.080.
+   - Size the real test with <code>shipornot n-paired 0.08 0.04 --check-exact</code>.
+   - Build that set from <strong>new</strong> cases, and test it once at 0.05.
+   - Never ship on the pilot result alone. In the report, state that an earlier 200-case pilot was inconclusive.
+   - If you pool old and new cases instead, label the result exploratory.
+6. <strong>Do not decide by checking whether A's and B's separate intervals overlap.</strong> Overlap does not show "no difference." Non-overlap does indicate a difference, but it is a far stricter test than you need, because it ignores the pairing.</p>
+<p>The synthetic data behind that example was generated with a true difference of +0.040. The eval was too small to see it, exactly as the MDE of 0.056 predicted.</p>
+<h2>When pairing does not help, or does not apply</h2>
+<ul>
+<li><strong>Different case sets for A and B.</strong> There are no pairs, so plan with the unpaired formula. shipornot 0.1.0 can size an unpaired design (<code>n-unpaired</code>), but it has no unpaired analysis command.</li>
+<li><strong>Live-traffic A/B tests.</strong> Different users see different variants, so there is no case-level pairing.</li>
+<li><strong>Clustered cases</strong>, such as several questions about the same document. Here the pairs are not independent of each other.</li>
+</ul>
+<p>With 5 questions per document and an intra-cluster correlation of 0.2, the design effect is 1.8. Then 200 questions give an effective n of about 111 (200 / 1.8). Adjust n before you plan.
+- <strong>Non-deterministic outputs.</strong> If B's result on a case changes from run to run, a single run understates the noise. Decide on reruns before you plan.</p>
+<hr />
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+<p>Free now: the Eval Noise Quick Card, two pages with Wilson intervals and MDE tables: <a href="../quick-card.pdf">the free Quick Card (PDF)</a></p>
+<p><em>All data in this article is synthetic. Written with AI assistance. Every number in this article comes from shipornot 0.1.0 (free, MIT: <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>) or from arithmetic shown in the text. Simulation checks shown here: the power of the sample-size formulas, the exact McNemar test's false alarm rate at n = 200, and its power at n = 489. The paired interval is not simulation-checked in this article.</em></p>
+</main>
+<footer class="site">Not on sale. No cookies, no trackers, no analytics on this site. Examples use synthetic data.</footer>
+</body>
+</html>

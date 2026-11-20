@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How many human labels before you trust an LLM judge?</title>
+<meta name="description" content="A free article from Is B Really Better? All data in this article is synthetic.">
+<style>
+:root{--bg:#fff;--fg:#1c2128;--muted:#5a6572;--accent:#0b5cad;--line:#d8dee4;--soft:#f4f6f8;--code:#f4f6f8;--warn:#fff7e0;--warnline:#e3c36a}
+@media (prefers-color-scheme:dark){:root{--bg:#14181d;--fg:#e4e8ec;--muted:#9aa5b1;--accent:#6cb0ff;--line:#2f3741;--soft:#1c222a;--code:#1c222a;--warn:#2b2615;--warnline:#7a6420}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header.site,footer.site{max-width:44rem;margin:0 auto;padding:1rem 16px;font-size:.9rem;color:var(--muted)}
+header.site{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;border-bottom:1px solid var(--line)}
+header.site a.brand{font-weight:700;color:var(--fg);text-decoration:none}
+footer.site{border-top:1px solid var(--line);margin-top:3rem}
+main{max-width:44rem;margin:0 auto;padding:1rem 16px}
+a{color:var(--accent)}
+h1{font-size:2rem;line-height:1.2;margin:1.2rem 0 .8rem}
+h2{font-size:1.45rem;line-height:1.25;margin:2.2rem 0 .6rem}
+h3{font-size:1.15rem;margin:1.6rem 0 .4rem;color:var(--muted)}
+h1,h2,h3,p,li{overflow-wrap:break-word}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+blockquote{margin:1rem 0;padding:.2rem 1rem;border-left:4px solid var(--line);background:var(--soft);color:var(--muted)}
+code{font:.88em ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;background:var(--code);padding:.1em .3em;border-radius:3px}
+pre,.codehilite{background:var(--code);border:1px solid var(--line);border-radius:6px;overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+pre{padding:.8rem 1rem;font-size:.85rem;line-height:1.5}
+.codehilite pre{border:0;margin:0;background:transparent}
+pre code{background:none;padding:0;font-size:inherit}
+.tablewrap{overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:.92rem;min-width:100%}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.notice{background:var(--warn);border:1px solid var(--warnline);border-radius:6px;padding:.1rem 1rem;margin:1rem 0}
+#notify{scroll-margin-top:1rem}
+@media (max-width:600px){body{font-size:17px}h1{font-size:1.65rem}pre{font-size:.8rem}th,td{padding:.3rem .45rem}}
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #ffffcc }
+.codehilite { background: #f0f0f0; }
+.codehilite .c { color: #60A0B0; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #F00 } /* Error */
+.codehilite .k { color: #007020; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666 } /* Operator */
+.codehilite .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #007020 } /* Comment.Preproc */
+.codehilite .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F00 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888 } /* Generic.Output */
+.codehilite .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #04D } /* Generic.Traceback */
+.codehilite .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #007020 } /* Keyword.Pseudo */
+.codehilite .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #902000 } /* Keyword.Type */
+.codehilite .m { color: #40A070 } /* Literal.Number */
+.codehilite .s { color: #4070A0 } /* Literal.String */
+.codehilite .na { color: #4070A0 } /* Name.Attribute */
+.codehilite .nb { color: #007020 } /* Name.Builtin */
+.codehilite .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #60ADD5 } /* Name.Constant */
+.codehilite .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.codehilite .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #007020 } /* Name.Exception */
+.codehilite .nf { color: #06287E } /* Name.Function */
+.codehilite .nl { color: #002070; font-weight: bold } /* Name.Label */
+.codehilite .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #BB60D5 } /* Name.Variable */
+.codehilite .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #BBB } /* Text.Whitespace */
+.codehilite .mb { color: #40A070 } /* Literal.Number.Bin */
+.codehilite .mf { color: #40A070 } /* Literal.Number.Float */
+.codehilite .mh { color: #40A070 } /* Literal.Number.Hex */
+.codehilite .mi { color: #40A070 } /* Literal.Number.Integer */
+.codehilite .mo { color: #40A070 } /* Literal.Number.Oct */
+.codehilite .sa { color: #4070A0 } /* Literal.String.Affix */
+.codehilite .sb { color: #4070A0 } /* Literal.String.Backtick */
+.codehilite .sc { color: #4070A0 } /* Literal.String.Char */
+.codehilite .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #4070A0 } /* Literal.String.Double */
+.codehilite .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.codehilite .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.codehilite .sx { color: #C65D09 } /* Literal.String.Other */
+.codehilite .sr { color: #235388 } /* Literal.String.Regex */
+.codehilite .s1 { color: #4070A0 } /* Literal.String.Single */
+.codehilite .ss { color: #517918 } /* Literal.String.Symbol */
+.codehilite .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #06287E } /* Name.Function.Magic */
+.codehilite .vc { color: #BB60D5 } /* Name.Variable.Class */
+.codehilite .vg { color: #BB60D5 } /* Name.Variable.Global */
+.codehilite .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.codehilite .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.codehilite .il { color: #40A070 } /* Literal.Number.Integer.Long */</style>
+</head>
+<body>
+<header class="site"><a class="brand" href="../index.html">Is B Really Better?</a><a href="../quick-card.pdf">Quick Card (free PDF)</a><a href="../articles/paired-beats-unpaired.html">Paired vs unpaired</a><a href="../articles/how-many-judge-labels.html">Judge labels</a><a href="../privacy.html">Privacy</a></header>
+<main>
+<h1>How many human labels before you trust an LLM judge?</h1>
+<p><em>A free article from</em> Is B Really Better? <em>All data in this article is synthetic.</em></p>
+<p>100 human labels sounds like plenty. But if only 27 of them are human fails, you know the judge's specificity only to within 0.72–0.96. Doubling to 200 labels narrows that to 0.78–0.95. Count labels in the rarer class.</p>
+<h2>The decision this supports</h2>
+<p>You grade outputs pass/fail with an LLM judge. Before its verdicts drive a ship call, you hand-label a sample and compare the two. The question is how many labels you need.</p>
+<p>A count alone does not answer it. You need enough labels that the <strong>interval</strong> around the judge's error rates is narrow enough to act on.</p>
+<p>The count that matters most is the number of labels in the <strong>rarer</strong> class. That class is usually the failures.</p>
+<h2>What you are estimating</h2>
+<p>Three numbers describe how well the judge matches human labels:</p>
+<ul>
+<li><strong>Sensitivity.</strong> Of the outputs a human passed, the share the judge also passed.</li>
+<li><strong>Specificity.</strong> Of the outputs a human failed, the share the judge also failed. A judge with low specificity passes bad outputs and inflates your scores.</li>
+<li><strong>Cohen's kappa</strong> (Cohen 1960). Agreement beyond what chance would produce.</li>
+</ul>
+<p>Raw agreement hides problems. In the synthetic validation set below, the judge agrees with humans on (67 + 24) / 100 = 0.91 of cases. It still passes 3 of the 27 outputs humans failed (27 − 24 = 3).</p>
+<p>Each of these numbers comes from a small sample, so each needs an interval:</p>
+<ul>
+<li>Sensitivity and specificity are proportions. Use the Wilson interval (Wilson 1927).</li>
+<li>Kappa gets a bootstrap interval.</li>
+</ul>
+<h2>The anchor: 100 labels</h2>
+<p>The example checks a judge against 100 synthetic human labels:</p>
+<div class="codehilite"><pre><span></span><code>shipornot<span class="w"> </span>kappa<span class="w"> </span>--csv<span class="w"> </span>judge_validation.csv<span class="w"> </span>--a-col<span class="w"> </span>judge<span class="w"> </span>--b-col<span class="w"> </span>human<span class="w"> </span>--confusion<span class="w"> </span>--n-boot<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">20261118</span>
+</code></pre></div>
+
+<p>Replace <code>judge</code> and <code>human</code> with your column names. Rater A is the judge and rater B is the human.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Estimate</th>
+<th>95% interval</th>
+<th>Width</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensitivity</td>
+<td>67/73 = 0.918</td>
+<td>[0.832, 0.962]</td>
+<td>0.962 − 0.832 = 0.130</td>
+</tr>
+<tr>
+<td>Specificity</td>
+<td>24/27 = 0.889</td>
+<td>[0.719, 0.961]</td>
+<td>0.961 − 0.719 = 0.242</td>
+</tr>
+<tr>
+<td>Kappa</td>
+<td>0.779</td>
+<td>[0.632, 0.901]</td>
+<td>0.901 − 0.632 = 0.269</td>
+</tr>
+</tbody>
+</table></div>
+<p>Look at the widths. The specificity interval is 0.242 / 0.130 ≈ 1.86 times as wide as the sensitivity interval.</p>
+<p>Both come from the same 100 labels. The difference is what each one rests on:</p>
+<ul>
+<li>Specificity rests only on the 27 human fails.</li>
+<li>Sensitivity rests on the 73 human passes.</li>
+</ul>
+<h2>50, 100 and 200 labels</h2>
+<p>The table below keeps the proportions of the 100-label set and changes only the label count. The 50- and 200-label tables are scaled from the 100-label table and rounded half up. The verification script in the repository prints the exact counts it used. Here is the arithmetic:</p>
+<ul>
+<li><strong>50 labels:</strong> 73 × 0.5 = 36.5 → 37 human passes and 50 − 37 = 13 human fails.</li>
+<li>Judge passes 67/73 × 37 ≈ 33.96 → 34 of the human passes.</li>
+<li>Judge fails 24/27 × 13 ≈ 11.56 → 12 of the human fails.
+  -</li>
+<li><strong>200 labels:</strong> 146 human passes and 54 human fails.</li>
+<li>Judge passes 67/73 × 146 = 134 of the human passes.</li>
+<li>Judge fails 24/27 × 54 = 48 of the human fails.
+  -</li>
+</ul>
+<p>Rounding moves the 50-label specificity to 12/13 ≈ 0.923, a little above the 0.889 at 100 labels. That pulls its interval slightly upward. It does not make the interval narrow.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Labels</th>
+<th>Sensitivity 95% CI (width)</th>
+<th>Specificity 95% CI (width)</th>
+<th>Kappa 95% CI (width)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>50</td>
+<td>[0.787, 0.972] (0.185)</td>
+<td>[0.667, 0.986] (0.319)</td>
+<td>[0.584, 0.956] (0.372)</td>
+</tr>
+<tr>
+<td>100</td>
+<td>[0.832, 0.962] (0.130)</td>
+<td>[0.719, 0.961] (0.242)</td>
+<td>[0.632, 0.901] (0.269)</td>
+</tr>
+<tr>
+<td>200</td>
+<td>[0.862, 0.952] (0.091)</td>
+<td>[0.778, 0.948] (0.170)</td>
+<td>[0.678, 0.870] (0.192)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Interval width shrinks with the square root of the label count, not in proportion to it. Doubling from 100 to 200 labels multiplies the widths by:</p>
+<ul>
+<li>sensitivity: 0.698</li>
+<li>specificity: 0.702</li>
+<li>kappa: 0.690</li>
+</ul>
+<p>All three are close to 1 / √2 ≈ 0.707.</p>
+<p>Doubling the labels doubles the labeling effort, but it cuts the width by only about 30%. Each additional batch narrows the interval less than the one before. Decide what width you can act on before you start labeling.</p>
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+<h2>Why the rarer class decides</h2>
+<p>If your system passes most cases, human fails are rare. Specificity then becomes the weak link. It also measures the error that inflates scores: the judge passing bad outputs.</p>
+<p>At 200 labels in the table above, specificity still rests on only 54 human fails. Its interval (0.170) is about as wide as the sensitivity interval you get from only 50 labels (0.185), and 1.87 times as wide as sensitivity at the same 200 labels (0.091).</p>
+<p>Plan your labels by class:</p>
+<ol>
+<li><strong>Guess the share of outputs humans will fail.</strong> The last eval is a reasonable source.</li>
+<li><strong>Work out how many human fails</strong> that gives you at each total label count.</li>
+<li><strong>Check the width</strong> you would get for a plausible specificity at that count. Use either of these:
+   - <code>shipornot wilson k n</code>
+   - the plain-Python <code>wilson</code> function under "Reproduce the numbers" below</li>
+</ol>
+<p>If specificity is near 0.90, the Wilson 95% width is about 0.27 with 20 human fails, 0.17 with 50, 0.12 with 100, and 0.08 with 200.</p>
+<p>Do not choose which cases to label based on the judge's verdict. That changes what your sensitivity and specificity measure. If fails are rare, label more randomly sampled cases.</p>
+<h2>What the labels do to your corrected score</h2>
+<p>A judge with known error rates lets you correct a judge-reported pass rate (Rogan &amp; Gladen 1978). The correction divides by J = sensitivity + specificity − 1:</p>
+<ul>
+<li>J = 1 is a perfect judge.</li>
+<li>J = 0 means the verdict carries no information.</li>
+<li>Below 0, the judge's verdicts are inverted.</li>
+</ul>
+<p>In this article's example, J = 0.918 + 0.889 − 1 = 0.807. As J falls toward zero, the correction becomes unstable.</p>
+<p>In the example, model A is judge-reported at 192/300 = 0.640:</p>
+<div class="codehilite"><pre><span></span><code>shipornot<span class="w"> </span>rogan-gladen<span class="w"> </span>--k-obs<span class="w"> </span><span class="m">192</span><span class="w"> </span>--n-obs<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tp<span class="w"> </span><span class="m">67</span><span class="w"> </span>--fn<span class="w"> </span><span class="m">6</span><span class="w"> </span>--tn<span class="w"> </span><span class="m">24</span><span class="w"> </span>--fp<span class="w"> </span><span class="m">3</span><span class="w"> </span>--method<span class="w"> </span>jeffreys<span class="w"> </span>--seed<span class="w"> </span><span class="m">20261118</span>
+</code></pre></div>
+
+<p>Here fn = 73 − 67 = 6 and fp = 27 − 24 = 3.</p>
+<p>The corrected rate is 0.656, with 95% interval [0.541, 0.754]. That interval has width 0.754 − 0.541 = 0.213.</p>
+<p>The width depends on how many validation labels you collect:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Labels</th>
+<th>Corrected pass rate for model A, 95% CI (width)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>50</td>
+<td>[0.518, 0.793] (0.275)</td>
+</tr>
+<tr>
+<td>100</td>
+<td>[0.541, 0.754] (0.213)</td>
+</tr>
+<tr>
+<td>200</td>
+<td>[0.562, 0.740] (0.178)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Going from 100 to 200 labels multiplies this width by 0.178 / 0.213 ≈ 0.84. That is a smaller gain than the 0.70 for sensitivity and specificity. The reason is that the corrected interval has two sources of width:</p>
+<ul>
+<li>the validation labels</li>
+<li>the 300 judged cases</li>
+</ul>
+<p>At 50 to 100 labels, more labels are the most efficient fix. Past that, judged cases also matter. If the corrected interval is too wide to separate the options you are choosing between, look at both before you add more of either.</p>
+<h2>A decision rule you can use</h2>
+<ol>
+<li><strong>Before labeling, write down your minimums.</strong> Record the lowest sensitivity and specificity you would accept for this decision. A judge used for a release gate needs tighter bounds than one used for a dashboard.</li>
+<li><strong>Fix the label count in advance.</strong> Use the tables above and count by the rarer class. Label in one batch.</li>
+<li><strong>Check the lower bounds.</strong> Trust the judge for this decision only if both lower bounds clear your minimums. If they do not, improve the judge or report human-graded results.</li>
+<li><strong>Check what the judge costs you in cases.</strong> Compute J from the lower ends of both intervals. With 100 labels: 0.832 + 0.719 − 1 = 0.551.
+   - Take the case count you planned for a perfect judge (Quick Card: paired n ≈ 7.84 × discordance / difference²) and multiply it by 1 / J². This is a rough planning factor. Here that is 1 / 0.551² ≈ 3.29.
+   - If the result is more cases than you can run, improve the judge before comparing.</li>
+<li><strong>If you trust the judge but it is imperfect,</strong> report corrected pass rates with their intervals.</li>
+</ol>
+<p>Do not add labels "until it passes." That is the peeking problem: checking repeatedly and stopping when the result looks good.</p>
+<p>In a simulation of a fixed-sample z-test, checking at 5 looks instead of 1 raised the false alarm rate from 0.050 to 0.141. An exact test gives somewhat different values.</p>
+<p>If your one planned batch leaves the lower bounds too wide to decide, do not top it up and re-check. Instead:</p>
+<ol>
+<li><strong>Treat that batch as a pilot.</strong> It tells you the share of human fails and roughly where sensitivity and specificity sit. Do not trust or reject the judge on the pilot.</li>
+<li><strong>Plan the full count from it.</strong></li>
+<li><strong>Label one fresh batch of new, randomly sampled cases.</strong></li>
+<li><strong>Decide once, on that batch alone.</strong></li>
+<li><strong>Report the pilot.</strong> State that an earlier batch was an inconclusive pilot.</li>
+</ol>
+<p>If you pool the pilot and the new batch instead, label the result exploratory.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Reporting raw agreement only.</strong> It hides a weak specificity whenever passes dominate.</li>
+<li><strong>Validating on the cases you used to tune the judge prompt.</strong> Those labels are no longer an independent test.</li>
+<li><strong>Validating on one system's outputs and then judging another.</strong> Judge errors can differ by system.</li>
+<li>Include outputs from both A and B in the validation sample.</li>
+<li>Check sensitivity and specificity separately for each if you can.</li>
+<li><strong>Comparing kappa across sets with different pass rates.</strong> Kappa depends on prevalence, so compare sensitivity and specificity instead.</li>
+<li><strong>Reusing old validation results</strong> after you change the judge model, the judge prompt, or the rubric.</li>
+</ul>
+<h2>When this does not apply</h2>
+<ul>
+<li><strong>Graded scores (for example 1–5).</strong> Sensitivity and specificity need pass/fail. <code>shipornot kappa</code> compares non-pass/fail labels as exact strings, so a 4 versus a 5 counts as full disagreement. This article does not cover weighted agreement.</li>
+<li><strong>Noisy human labels.</strong> First measure agreement between two humans on a subset. You cannot show a judge is better than your labels allow.</li>
+<li><strong>Several outputs per document.</strong> Those labels are not independent. This article does not cover clustered cases.</li>
+</ul>
+<h2>Bottom line</h2>
+<p>Count labels by the rarer class. Fix the count before you start, and read the lower bounds rather than the point estimates.</p>
+<p>Doubling the labels cuts interval widths by only about 30%. The width you need depends on the decision. The tables above show what each label count gives you.</p>
+<h2>Reproduce the numbers</h2>
+<p>shipornot 0.1.0 is free under the MIT license: <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>. The same repository holds <code>judge_validation.csv</code> and <code>verify_article02.py</code>, which builds the 50- and 200-label tables and prints every number in this article.</p>
+<p>The 100-label row:</p>
+<div class="codehilite"><pre><span></span><code>shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">67</span><span class="w"> </span><span class="m">73</span><span class="w">        </span><span class="c1"># sensitivity</span>
+shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">24</span><span class="w"> </span><span class="m">27</span><span class="w">        </span><span class="c1"># specificity</span>
+shipornot<span class="w"> </span>kappa<span class="w"> </span>--csv<span class="w"> </span>judge_validation.csv<span class="w"> </span>--a-col<span class="w"> </span>judge<span class="w"> </span>--b-col<span class="w"> </span>human<span class="w"> </span>--confusion<span class="w"> </span>--n-boot<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">20261118</span>
+shipornot<span class="w"> </span>rogan-gladen<span class="w"> </span>--k-obs<span class="w"> </span><span class="m">192</span><span class="w"> </span>--n-obs<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tp<span class="w"> </span><span class="m">67</span><span class="w"> </span>--fn<span class="w"> </span><span class="m">6</span><span class="w"> </span>--tn<span class="w"> </span><span class="m">24</span><span class="w"> </span>--fp<span class="w"> </span><span class="m">3</span><span class="w"> </span>--method<span class="w"> </span>jeffreys<span class="w"> </span>--seed<span class="w"> </span><span class="m">20261118</span>
+</code></pre></div>
+
+<p>The Wilson cells of the 50- and 200-label rows:</p>
+<div class="codehilite"><pre><span></span><code>shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">34</span><span class="w"> </span><span class="m">37</span><span class="w">        </span><span class="c1"># sensitivity, 50 labels</span>
+shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">12</span><span class="w"> </span><span class="m">13</span><span class="w">        </span><span class="c1"># specificity, 50 labels</span>
+shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">134</span><span class="w"> </span><span class="m">146</span><span class="w">      </span><span class="c1"># sensitivity, 200 labels</span>
+shipornot<span class="w"> </span>wilson<span class="w"> </span><span class="m">48</span><span class="w"> </span><span class="m">54</span><span class="w">        </span><span class="c1"># specificity, 200 labels</span>
+</code></pre></div>
+
+<p>The kappa and corrected-rate intervals come from resampling. Keep the seed shown; with a different seed, the third decimal can move.</p>
+<p>Without shipornot, this plain-Python function reproduces the sensitivity and specificity columns:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wilson</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.959964</span><span class="p">):</span>          <span class="c1"># 95% Wilson interval</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="n">d</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">z</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">c</span> <span class="o">-</span> <span class="n">h</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">c</span> <span class="o">+</span> <span class="n">h</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">wilson</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">))</span>                  <span class="c1"># specificity, 100 labels</span>
+</code></pre></div>
+
+<h2>About this article</h2>
+<p>Written with AI assistance. Every number in this article comes from shipornot 0.1.0 (free, MIT: <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>) or from arithmetic shown in the text. Simulation checks cover the Wilson interval used here. The kappa and corrected-rate intervals are not simulation-checked.</p>
+<hr />
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+<p>Free sample: <a href="../quick-card.pdf">the free Quick Card (PDF)</a></p>
+</main>
+<footer class="site">Not on sale. No cookies, no trackers, no analytics on this site. Examples use synthetic data.</footer>
+</body>
+</html>

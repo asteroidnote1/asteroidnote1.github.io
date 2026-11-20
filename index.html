@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is B Really Better?</title>
+<meta name="description" content="A decision guide for LLM evals. Free Quick Card and free articles. Not on sale.">
+<style>
+:root{--bg:#fff;--fg:#1c2128;--muted:#5a6572;--accent:#0b5cad;--line:#d8dee4;--soft:#f4f6f8;--code:#f4f6f8;--warn:#fff7e0;--warnline:#e3c36a}
+@media (prefers-color-scheme:dark){:root{--bg:#14181d;--fg:#e4e8ec;--muted:#9aa5b1;--accent:#6cb0ff;--line:#2f3741;--soft:#1c222a;--code:#1c222a;--warn:#2b2615;--warnline:#7a6420}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header.site,footer.site{max-width:44rem;margin:0 auto;padding:1rem 16px;font-size:.9rem;color:var(--muted)}
+header.site{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;border-bottom:1px solid var(--line)}
+header.site a.brand{font-weight:700;color:var(--fg);text-decoration:none}
+footer.site{border-top:1px solid var(--line);margin-top:3rem}
+main{max-width:44rem;margin:0 auto;padding:1rem 16px}
+a{color:var(--accent)}
+h1{font-size:2rem;line-height:1.2;margin:1.2rem 0 .8rem}
+h2{font-size:1.45rem;line-height:1.25;margin:2.2rem 0 .6rem}
+h3{font-size:1.15rem;margin:1.6rem 0 .4rem;color:var(--muted)}
+h1,h2,h3,p,li{overflow-wrap:break-word}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+blockquote{margin:1rem 0;padding:.2rem 1rem;border-left:4px solid var(--line);background:var(--soft);color:var(--muted)}
+code{font:.88em ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;background:var(--code);padding:.1em .3em;border-radius:3px}
+pre,.codehilite{background:var(--code);border:1px solid var(--line);border-radius:6px;overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+pre{padding:.8rem 1rem;font-size:.85rem;line-height:1.5}
+.codehilite pre{border:0;margin:0;background:transparent}
+pre code{background:none;padding:0;font-size:inherit}
+.tablewrap{overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:.92rem;min-width:100%}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.notice{background:var(--warn);border:1px solid var(--warnline);border-radius:6px;padding:.1rem 1rem;margin:1rem 0}
+#notify{scroll-margin-top:1rem}
+@media (max-width:600px){body{font-size:17px}h1{font-size:1.65rem}pre{font-size:.8rem}th,td{padding:.3rem .45rem}}
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #ffffcc }
+.codehilite { background: #f0f0f0; }
+.codehilite .c { color: #60A0B0; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #F00 } /* Error */
+.codehilite .k { color: #007020; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666 } /* Operator */
+.codehilite .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #007020 } /* Comment.Preproc */
+.codehilite .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F00 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888 } /* Generic.Output */
+.codehilite .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #04D } /* Generic.Traceback */
+.codehilite .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #007020 } /* Keyword.Pseudo */
+.codehilite .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #902000 } /* Keyword.Type */
+.codehilite .m { color: #40A070 } /* Literal.Number */
+.codehilite .s { color: #4070A0 } /* Literal.String */
+.codehilite .na { color: #4070A0 } /* Name.Attribute */
+.codehilite .nb { color: #007020 } /* Name.Builtin */
+.codehilite .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #60ADD5 } /* Name.Constant */
+.codehilite .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.codehilite .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #007020 } /* Name.Exception */
+.codehilite .nf { color: #06287E } /* Name.Function */
+.codehilite .nl { color: #002070; font-weight: bold } /* Name.Label */
+.codehilite .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #BB60D5 } /* Name.Variable */
+.codehilite .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #BBB } /* Text.Whitespace */
+.codehilite .mb { color: #40A070 } /* Literal.Number.Bin */
+.codehilite .mf { color: #40A070 } /* Literal.Number.Float */
+.codehilite .mh { color: #40A070 } /* Literal.Number.Hex */
+.codehilite .mi { color: #40A070 } /* Literal.Number.Integer */
+.codehilite .mo { color: #40A070 } /* Literal.Number.Oct */
+.codehilite .sa { color: #4070A0 } /* Literal.String.Affix */
+.codehilite .sb { color: #4070A0 } /* Literal.String.Backtick */
+.codehilite .sc { color: #4070A0 } /* Literal.String.Char */
+.codehilite .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #4070A0 } /* Literal.String.Double */
+.codehilite .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.codehilite .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.codehilite .sx { color: #C65D09 } /* Literal.String.Other */
+.codehilite .sr { color: #235388 } /* Literal.String.Regex */
+.codehilite .s1 { color: #4070A0 } /* Literal.String.Single */
+.codehilite .ss { color: #517918 } /* Literal.String.Symbol */
+.codehilite .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #06287E } /* Name.Function.Magic */
+.codehilite .vc { color: #BB60D5 } /* Name.Variable.Class */
+.codehilite .vg { color: #BB60D5 } /* Name.Variable.Global */
+.codehilite .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.codehilite .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.codehilite .il { color: #40A070 } /* Literal.Number.Integer.Long */</style>
+</head>
+<body>
+<header class="site"><a class="brand" href="index.html">Is B Really Better?</a><a href="quick-card.pdf">Quick Card (free PDF)</a><a href="articles/paired-beats-unpaired.html">Paired vs unpaired</a><a href="articles/how-many-judge-labels.html">Judge labels</a><a href="privacy.html">Privacy</a></header>
+<main>
+<h1>Is B Really Better?</h1>
+<h3>A decision guide for LLM evals — honest intervals, paired comparisons, and how many cases you actually need</h3>
+<blockquote>
+<p>32 passes out of 40 looks like 0.80. The honest 95% range is 0.65 to 0.90.  Was your last "improvement" inside that range?</p>
+</blockquote>
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+<p><strong><a href="quick-card.pdf">Download the free Quick Card</a></strong> — no email needed<br />
+<strong><a href="https://github.com/asteroidnote1/shipornot">Get the free shipornot tool</a></strong> — MIT license</p>
+<hr />
+<h2>The problem</h2>
+<p>You changed a prompt, a model, or your retrieval step. The eval score went up. Then someone asks: <em>"Is B really better, or did we get lucky?"</em></p>
+<ul>
+<li>You rerun the eval and the score moves.</li>
+<li>The LLM judge doesn't fully agree with itself, or with you.</li>
+<li>Many of your cases come from the same few documents.</li>
+<li>Nobody agreed beforehand what "better" means, or how sure you need to be.</li>
+</ul>
+<p>So the ship decision comes down to gut feeling, or to whoever argues longest.</p>
+<p>Computing a statistic is the easy part, and free libraries already do it. The hard part is knowing <strong>which question you're asking</strong>, <strong>which number answers it</strong>, <strong>how many cases you need</strong>, and <strong>how to write it up</strong> so a non-statistician can make the call.</p>
+<h2>What the guide helps you do</h2>
+<p>After reading it, you can:</p>
+<ol>
+<li><strong>Put an honest interval on a pass/fail or graded eval score.</strong></li>
+<li><strong>Decide whether B beats A on the same cases, with a stated error rate.</strong></li>
+<li><strong>Work out how many cases you need before you build them.</strong></li>
+<li><strong>Report the result on one page</strong> that a non-statistician can act on.</li>
+</ol>
+<h2>Who it's for</h2>
+<ul>
+<li>Engineers, PMs, and tech leads who own an eval set of roughly 30–2,000 cases. The main focus is pass/fail scores; graded scores are covered more briefly.</li>
+<li>People who must decide whether a prompt, model, or retrieval change is a real improvement.</li>
+<li>Anyone who can run a Python script. No statistics background assumed.</li>
+</ul>
+<h2>Who it's not for</h2>
+<ul>
+<li>Learning to design evals from scratch.</li>
+<li>Benchmark research that needs item response theory or hierarchical Bayesian models.</li>
+<li>Step-by-step tutorials for a specific vendor's eval tool.</li>
+<li>Live-traffic A/B testing. The guide includes only a short note on this.</li>
+</ul>
+<h2>What it covers</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Chapter</th>
+<th>The decision it supports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 · Start Here</td>
+<td>A 10-minute triage: which question are you asking, and where to go next</td>
+</tr>
+<tr>
+<td>1 · Why your score wiggles</td>
+<td>Is this movement worth looking at at all?</td>
+</tr>
+<tr>
+<td>2 · One score, one interval</td>
+<td>How sure can you be about a single score?</td>
+</tr>
+<tr>
+<td>3 · A vs B on the same cases</td>
+<td>Does B beat A, using the fact that both ran on the same cases?</td>
+</tr>
+<tr>
+<td>4 · How many cases do I need?</td>
+<td>Is your eval set big enough <em>before</em> you build it?</td>
+</tr>
+<tr>
+<td>5 · Reruns and non-determinism</td>
+<td>What to do when the same case gives different answers</td>
+</tr>
+<tr>
+<td>6 · Clustered cases</td>
+<td>When cases aren't independent (same document, same user, same template)</td>
+</tr>
+<tr>
+<td>7 · The judge is a noisy instrument</td>
+<td>How much to trust an LLM or human judge, and how to correct for it</td>
+</tr>
+<tr>
+<td>8 · Many comparisons and repeated looks</td>
+<td>Avoiding false wins when you test many variants or check often. Includes a non-inferiority gate for CI</td>
+</tr>
+<tr>
+<td>9 · Reporting and decision rules</td>
+<td>Ship/no-ship rules and a one-page report</td>
+</tr>
+<tr>
+<td>10 · Five worked examples</td>
+<td>End-to-end, on synthetic data</td>
+</tr>
+<tr>
+<td>Appendices</td>
+<td>Formula sheet with primary references, verification report, glossary</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>shipornot</code> command-line tool (version 0.1.0, with unit tests, MIT license) is already free at <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>. The guide adds:</p>
+<ul>
+<li><strong>The decision procedure</strong> in the chapters above: which command to run, when, and what to conclude.</li>
+<li><strong>The simulation scripts and saved results</strong> behind the verification report.</li>
+<li><strong>A CI regression-gate script.</strong></li>
+<li><strong>Synthetic example datasets</strong> with a walkthrough.</li>
+<li><strong>A calculator workbook</strong> for the pass/fail calculations (intervals, the paired comparison, sample size, MDE, and the gate). Bootstrap and simulation need Python with shipornot.</li>
+<li><strong>Checklists and a one-page report template.</strong></li>
+</ul>
+<p>The procedure also works with any tool that exports per-case results as CSV.</p>
+<h2>Free: the Quick Card</h2>
+<p>The Quick Card answers two questions about a single eval score: what is the honest range for the true rate, and can an eval this size detect the difference you care about? It includes a lookup table, a paired-planning shortcut, and a few lines of plain Python.</p>
+<p><strong><a href="quick-card.pdf">Download the Quick Card</a></strong>. No signup needed.</p>
+<h2 id="notify">Hear when the guide launches</h2>
+<div class="notice"><p><strong>No email list yet.</strong> To hear when the guide is released, watch the <a href="https://github.com/asteroidnote1/shipornot">shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed, and it commits you to nothing. The Quick Card above works without any signup.</p></div>
+
+<h2>Privacy</h2>
+<p>This site uses no cookies and no analytics. See the <a href="privacy.html">privacy note</a>.</p>
+<h2>About this guide</h2>
+<p>Written with AI assistance. Every number in this guide comes from shipornot 0.1.0 (free, MIT: <a href="https://github.com/asteroidnote1/shipornot">https://github.com/asteroidnote1/shipornot</a>), from the simulation scripts that come with the guide, or from arithmetic shown in the text. The core methods are checked by simulation; Appendix B lists what was checked and what was not. All examples use synthetic data.</p>
+<hr />
+<p><em>Is B Really Better?</em> is not on sale. To hear when it is released, watch <a href="https://github.com/asteroidnote1/shipornot">the shipornot repository</a> on GitHub (Watch → Custom → Releases). No email is needed.</p>
+</main>
+<footer class="site">Not on sale. No cookies, no trackers, no analytics on this site. Examples use synthetic data.</footer>
+</body>
+</html>
